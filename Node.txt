@@ -1,0 +1,208 @@
+if(c+m<=5)
+                {
+                    int lc = left_can - (c + 1);
+                    int lm = left_mis - (m + 1);
+                    
+                    int rc = right_can + c + 1;
+                    int rm = right_mis + m + 1;
+                    
+                    int valid = get_valid(lc,rc,lm,rm);
+                    if(valid == 0)
+                    {
+                        VC[count] = c+1;
+                        VM[count] = m+1;
+                        
+                        count++;
+                        
+                        System.out.println("Valid");
+                        System.out.println("values = "+"c= "+(c+1)+" m = "+(m+1)+"\t"+(c+1+m+1));
+                    }package Noman;
+public class Node 
+{
+    int left_can = 6;
+    int right_can = 0;
+    
+    int left_mis = 6;
+    int right_mis = 0;
+    
+    int boat_c = 0;
+    int boat_m = 0;
+    
+    // boat_pos = 0 means on the left
+    // boat_pos = 1 means on the right
+    int boat_pos = 0;
+    
+    //Function to calculate valid boat combinations
+    //this function is considered G(n)
+    //for valid low value, invaild high value
+    int get_valid(int lc, int rc, int lm,int rm)
+    {
+        if(lm == 0)
+        {
+            return 0;
+        }
+        if(lc>lm || rc>rm)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    //hueristtic value for left and right
+    //this has to be min
+    float get_hue(int lc,int lm,int boatval)
+    {
+        float value = lc + lm; 
+        value = value / boatval;
+        //System.out.println("value:  "+value);
+        return value; 
+    }
+    
+    static int counter = 1;
+    void astar()
+    {
+        
+        
+        System.out.println("Iteration: "+counter);
+        
+        if(boat_pos == 0)
+        {
+            System.out.println("Boat on left at start");
+        }
+        else
+        {
+            System.out.println("Boat on Right at start");
+        }
+        
+        System.out.println("Left Canibals = "+left_can+" Left Missionarys = "+left_mis+" Right Canibals = "+right_can+ " Right Missionarys = "+right_mis);
+        counter++;
+        //for storing all possible valid combinations
+        int VC[] = new int[20];
+        int VM[] = new int[20];
+        int count = 0;
+        for(int i=0;i<20;i++)
+        {
+            VC[i] = -1;
+            VM[i] = -1;
+        }
+        
+        int cc;
+        int mm;
+        
+        if(boat_pos == 0)
+        {
+            cc = left_can;
+            mm = left_mis;
+        }
+        else
+        {
+            cc = right_can;
+            mm = right_mis;
+        }
+        
+        //possible valid combinations for boat
+        for(int c=0;c<=cc;c++)
+        {
+            for(int m=0;m<=mm;m++)
+            {
+                if(c+m<=5)
+                {
+                    if(c == 0 && m == 0)
+                    {
+                        c = 0;
+                        m = 1;
+                    }
+                    int lc = left_can - (c);
+                    int lm = left_mis - (m);
+                    
+                    int rc = right_can + c;
+                    int rm = right_mis + m;
+                    
+                    int valid = get_valid(lc,rc,lm,rm);
+                    if(valid == 0)
+                    {
+                        VC[count] = c;
+                        VM[count] = m;
+                        
+                        count++;
+                        
+//                        System.out.println("Valid");
+//                        System.out.println("values = "+"c= "+(c)+" m = "+(m)+"\t"+(c+m));
+//                        System.out.println("");
+                    }
+                }
+                //System.out.println("values = "+"c= "+(c)+" m = "+(m)+"\t"+(c+m));
+            }
+        }
+
+        float min = 1000;
+        int pos = 0;
+        float max = -1;
+        for(int i=0;i<count;i++)
+        {
+            if(boat_pos == 0)
+            {
+                int lc = left_can - VC[i];
+                int lm = left_mis - VM[i];
+                int boatval = VM[i] + VC[i];
+                float x = get_hue(lc,lm,boatval);
+                if(x<min)
+                {
+                    pos = i;
+                    min = x;
+                }
+            }
+            else
+            {
+                int rc = right_can - VC[i];
+                int rm = right_mis - VM[i];
+                int boatval = VM[i] + VC[i];
+                float x = get_hue(rc,rm,boatval);
+                if(x>max)
+                {
+                    pos = i;
+                    max = x;
+                }
+            }
+        }
+        
+        System.out.println("Boat Contains:  "+"Canibals= "+VC[pos]+" Missionarys = "+VM[pos]);
+        System.out.println("");
+
+        //System.out.println("chosen pos values = "+"c= "+(VC[pos])+" m = "+(VM[pos])+"\t"+(VC[pos]+VM[pos]));
+        if(boat_pos == 0)
+        {
+            left_can = left_can - VC[pos];
+            left_mis = left_mis - VM[pos];
+            
+            right_can = right_can + VC[pos];
+            right_mis = right_mis + VM[pos];
+            
+            boat_pos = 1;
+        }
+        else
+        {
+            left_can = left_can + VC[pos];
+            left_mis = left_mis + VM[pos];
+            
+            right_can = right_can - VC[pos];
+            right_mis = right_mis - VM[pos];
+            
+            boat_pos = 0;
+        }
+        System.out.println("Left Canibals = "+left_can+" Left Missionarys = "+left_mis+" Right Canibals = "+right_can+ " Right Missionarys = "+right_mis);
+        System.out.println();
+        System.out.println("");
+        if(left_can + left_mis == 0)
+        {
+            System.out.println("Solution Found");
+            return;
+        }
+        astar();
+        
+        
+    }
+    
+}
